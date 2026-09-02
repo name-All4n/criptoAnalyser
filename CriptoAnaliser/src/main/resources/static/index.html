@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>criptoAnalyser · painel</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,500;0,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<header class="masthead">
+    <div class="masthead-in">
+        <div class="brand">
+            <span class="eyebrow">Arbitragem entre corretoras · Fase A</span>
+            <h1>criptoAnalyser</h1>
+        </div>
+        <div class="masthead-meta">
+            <div class="meta-item">
+                <span class="eyebrow">Fonte</span>
+                <span id="pill-modo" class="pill pill--demo"><span class="dot"></span><span>carregando</span></span>
+            </div>
+            <div class="meta-item">
+                <span class="eyebrow">Coleta</span>
+                <b id="m-idade" class="num">—</b>
+            </div>
+            <div class="meta-item hide-sm">
+                <span class="eyebrow">Volume</span>
+                <b id="m-volume" class="num">—</b>
+            </div>
+            <div class="meta-item hide-sm">
+                <span class="eyebrow">Exchanges</span>
+                <b id="m-exchanges" class="num">—</b>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="wrap">
+
+    <div class="controls">
+        <div class="field">
+            <label for="limiar">Limiar de alerta</label>
+            <input id="limiar" type="number" step="0.05" value="0.30" min="-5" max="5">
+            <span style="font-size:.8125rem;color:var(--ink-3)">% líquido</span>
+        </div>
+        <label class="switch">
+            <input type="checkbox" id="auto" checked>
+            <span class="box"></span>
+            <span class="t">Atualizar a cada 60s</span>
+        </label>
+        <button class="act" id="btn-refresh" style="margin-left:auto">Atualizar agora</button>
+    </div>
+
+    <div class="notice" id="notice">
+        <i data-lucide="alert-triangle" width="16" height="16"></i>
+        <div id="notice-txt"></div>
+    </div>
+
+    <div class="sec-head">
+        <h2>Oportunidades</h2>
+        <div class="rule"></div>
+        <span class="eyebrow">última coleta</span>
+    </div>
+    <p class="sec-note">
+        O bruto é a diferença de preço entre as duas pontas. O líquido já paga as duas comissões taker.
+        A distância entre os dois é o motivo pelo qual olhar só o ticker engana.
+    </p>
+    <div id="pares"></div>
+
+    <div class="sec-head">
+        <h2>Livro de preços</h2>
+        <div class="rule"></div>
+        <span class="eyebrow">topo do livro</span>
+    </div>
+    <div class="ledger-scroll">
+        <table class="ledger">
+            <thead>
+            <tr>
+                <th>Exchange</th>
+                <th>Compra (ask)</th>
+                <th>Venda (bid)</th>
+                <th>Spread interno</th>
+                <th>Taxa taker</th>
+            </tr>
+            </thead>
+            <tbody id="ledger-body"></tbody>
+        </table>
+    </div>
+
+    <div class="sec-head">
+        <h2>Histórico da sessão</h2>
+        <div class="rule"></div>
+        <span class="eyebrow">melhor rota por par</span>
+    </div>
+    <p class="sec-note">
+        Acumulado no navegador enquanto a página fica aberta. Vai ser trocado pelo <code style="font-size:.75rem">GET /api/historico</code>
+        quando o endpoint existir.
+    </p>
+    <div class="chart-box"><canvas id="chart"></canvas></div>
+
+    <footer>
+        <p>
+            Modo observação: nenhuma ordem é enviada, nenhuma chave de API é usada.
+            Rotas classificadas como oportunidade precisam de conferência manual antes de qualquer execução.
+        </p>
+    </footer>
+</main>
+
+<script src="script.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => lucide.createIcons());
+</script>
+</body>
+</html>
