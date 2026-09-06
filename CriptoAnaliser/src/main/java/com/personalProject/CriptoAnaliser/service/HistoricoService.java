@@ -6,13 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 @Service
 public class HistoricoService {
@@ -28,20 +26,24 @@ public class HistoricoService {
         List<HistoricoDTO> result = new ArrayList<>();
 
         for (Object[] row : raw) {
-            Timestamp ts = (Timestamp) row[0];
             String sym = (String) row[1];
-            BigDecimal lucro = (BigDecimal) row[2];
-            String exCompra = (String) row[3];
-            String exVenda = (String) row[4];
-
             if (simbolo != null && !sym.equalsIgnoreCase(simbolo)) continue;
 
-            OffsetDateTime dt = ts.toInstant().atZone(ZoneId.of("UTC")).toOffsetDateTime();
-            String rota = exCompra + " → " + exVenda;
+            OffsetDateTime dt = toOffsetDateTime(row[0]);
+            BigDecimal lucro = (BigDecimal) row[2];
+            String rota = row[3] + " → " + row[4];
 
             result.add(new HistoricoDTO(dt, sym, lucro, rota, 1));
         }
 
         return result;
+    }
+
+    private static OffsetDateTime toOffsetDateTime(Object valor) {
+        if (valor instanceof OffsetDateTime o) return o;
+        if (valor instanceof Instant i) return i.atOffset(ZoneOffset.UTC);
+        if (valor instanceof java.sql.Timestamp t) return t.toInstant().atOffset(ZoneOffset.UTC);
+        if (valor instanceof java.time.LocalDateTime l) return l.atOffset(ZoneOffset.UTC);
+        throw new IllegalStateException("tipo inesperado em coletado_em: " + valor.getClass());
     }
 }
